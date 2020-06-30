@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using Nwassa.Core.Accounts;
 using Nwassa.Core.Data;
 using Nwassa.Core.Emails;
+using Nwassa.Core.Files;
 using Nwassa.Core.Helpers;
 using Nwassa.Core.Products;
 using Nwassa.Core.Purchases;
@@ -69,6 +70,10 @@ namespace Nwassa
             var notificationMetadata = Configuration.GetSection("NotificationMetadata").
              Get<NotificationMetadata>();
             services.AddSingleton(notificationMetadata);
+
+            var cloudinary = Configuration.GetSection("Cloudinary").
+            Get<CloudinaryMetaData>();
+            services.AddSingleton(cloudinary);
 
             // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();

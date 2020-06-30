@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Nwassa.Core.Data;
+using Nwassa.Core.Files;
 using Nwassa.Core.Helpers;
 using Nwassa.Core.Products;
 using Nwassa.Core.Products.Models;
@@ -20,13 +23,15 @@ namespace Nwassa.Domain_Services.Products
         private readonly IProductRepository _productRepository;
 		private readonly IUserContext _userContext;
 		private readonly IWebHostEnvironment _hostingEnvironment;
+		private readonly CloudinaryMetaData _cloudinaryMetaData;
 
 		public ProductService(IProductRepository productRepository,
-			IUserContext userContext, IWebHostEnvironment hostingEnvironment)
+			IUserContext userContext, IWebHostEnvironment hostingEnvironment, CloudinaryMetaData cloudinaryMetaData)
         {
             _productRepository = productRepository;
 			_userContext = userContext;
 			_hostingEnvironment = hostingEnvironment;
+			_cloudinaryMetaData = cloudinaryMetaData;
 		}
 
         public List<ProductDocument> Get() =>
@@ -50,22 +55,36 @@ namespace Nwassa.Domain_Services.Products
 				{
 					throw new InvalidOperationException("Invalid image extension");
 				}
-				string folderName = "Upload";
-				string webRootPath = _hostingEnvironment.ContentRootPath;
-				string newPath = Path.Combine(webRootPath, folderName, "Products", $"{productDocument.Id}");
-				if (!Directory.Exists(newPath))
-				{
-					Directory.CreateDirectory(newPath);
-				}
+				//string folderName = "Upload";
+				//string webRootPath = _hostingEnvironment.ContentRootPath;
+				//string newPath = Path.Combine(webRootPath, folderName, "Products", $"{productDocument.Id}");
+				//if (!Directory.Exists(newPath))
+				//{
+				//	Directory.CreateDirectory(newPath);
+				//}
 				if (file.Length > 0)
 				{
+					CloudinaryDotNet.Account account = new CloudinaryDotNet.Account(
+							_cloudinaryMetaData.CloudName,
+							_cloudinaryMetaData.ApiKey,
+							_cloudinaryMetaData.ApiSecret);
+
+					Cloudinary cloudinary = new Cloudinary(account);
+
 					var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.RemoveSpecialCharacters().Trim('"');
-					string fullPath = Path.Combine(newPath, fileName);
-					using (var stream = new FileStream(fullPath, FileMode.Create))
+
+					var uploadParams = new ImageUploadParams()
 					{
-						file.CopyTo(stream);
-					}
-					productDocument.ProductPhoto = fileName;
+						File = new FileDescription(fileName, file.OpenReadStream())
+					};
+					var uploadResult = cloudinary.Upload(uploadParams);
+
+					//string fullPath = Path.Combine(newPath, fileName);
+					//using (var stream = new FileStream(fullPath, FileMode.Create))
+					//{
+					//	file.CopyTo(stream);
+					//}
+					productDocument.ProductPhoto = uploadResult.Url.AbsoluteUri;
 				}
 				return _productRepository.Create(productDocument);
 
@@ -93,22 +112,36 @@ namespace Nwassa.Domain_Services.Products
 				{
 					throw new InvalidOperationException("Invalid image extension");
 				}
-				string folderName = "Upload";
-				string webRootPath = _hostingEnvironment.ContentRootPath;
-				string newPath = Path.Combine(webRootPath, folderName, "Products", $"{productId}");
-				if (!Directory.Exists(newPath))
-				{
-					Directory.CreateDirectory(newPath);
-				}
+				//string folderName = "Upload";
+				//string webRootPath = _hostingEnvironment.ContentRootPath;
+				//string newPath = Path.Combine(webRootPath, folderName, "Products", $"{productDocument.Id}");
+				//if (!Directory.Exists(newPath))
+				//{
+				//	Directory.CreateDirectory(newPath);
+				//}
 				if (file.Length > 0)
 				{
+					CloudinaryDotNet.Account account = new CloudinaryDotNet.Account(
+							_cloudinaryMetaData.CloudName,
+							_cloudinaryMetaData.ApiKey,
+							_cloudinaryMetaData.ApiSecret);
+
+					Cloudinary cloudinary = new Cloudinary(account);
+
 					var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.RemoveSpecialCharacters().Trim('"');
-					string fullPath = Path.Combine(newPath, fileName);
-					using (var stream = new FileStream(fullPath, FileMode.Create))
+
+					var uploadParams = new ImageUploadParams()
 					{
-						file.CopyTo(stream);
-					}
-					product.ProductPhoto = fileName;
+						File = new FileDescription(fileName, file.OpenReadStream())
+					};
+					var uploadResult = cloudinary.Upload(uploadParams);
+
+					//string fullPath = Path.Combine(newPath, fileName);
+					//using (var stream = new FileStream(fullPath, FileMode.Create))
+					//{
+					//	file.CopyTo(stream);
+					//}
+					product.ProductPhoto = uploadResult.Url.AbsoluteUri;
 				}
 
 				_productRepository.Update(productId, product);

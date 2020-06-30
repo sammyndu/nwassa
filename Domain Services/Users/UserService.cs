@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Nwassa.Core.Constants;
 using Nwassa.Core.Data;
+using Nwassa.Core.Files;
 using Nwassa.Core.Helpers;
 using Nwassa.Core.Users;
 using Nwassa.Core.Users.Models;
@@ -24,12 +27,14 @@ namespace Nwassa.Domain_Services.Users
         private readonly IUserRepository _userRepository;
         private readonly IUserContext _userContext;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly CloudinaryMetaData _cloudinaryMetaData;
 
-        public UserService(IUserRepository userRepository, IUserContext userContext, IWebHostEnvironment hostingEnvironment)
+        public UserService(IUserRepository userRepository, IUserContext userContext, IWebHostEnvironment hostingEnvironment, CloudinaryMetaData cloudinaryMetaData)
         {
             _userRepository = userRepository;
             _userContext =  userContext;
             _hostingEnvironment = hostingEnvironment;
+            _cloudinaryMetaData = cloudinaryMetaData;
         }
 
         public List<UserDocument> GetAll() =>
@@ -92,39 +97,51 @@ namespace Nwassa.Domain_Services.Users
                 {
                     throw new InvalidOperationException("Invalid image extension");
                 }
-                string folderName = "Upload";
-                string webRootPath = _hostingEnvironment.ContentRootPath;
-                string newPath = "";
-                if (file.Name == "idCard")
-                {
-                    newPath = Path.Combine(webRootPath, folderName, "Users", "IdCard", $"{Id}");
-                }
-                if (file.Name == "passportPhoto")
-                {
-                    newPath = Path.Combine(webRootPath, folderName, "Users", "PassportPhoto", $"{Id}");
-                }
+                //string folderName = "Upload";
+                //string webRootPath = _hostingEnvironment.ContentRootPath;
+                //string newPath = "";
+                //if (file.Name == "idCard")
+                //{
+                //    newPath = Path.Combine(webRootPath, folderName, "Users", "IdCard", $"{Id}");
+                //}
+                //if (file.Name == "passportPhoto")
+                //{
+                //    newPath = Path.Combine(webRootPath, folderName, "Users", "PassportPhoto", $"{Id}");
+                //}
 
-                if (!Directory.Exists(newPath))
-                {
-                    Directory.CreateDirectory(newPath);
-                }
+                //if (!Directory.Exists(newPath))
+                //{
+                //    Directory.CreateDirectory(newPath);
+                //}
                 if (file.Length > 0)
                 {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    string fullPath = Path.Combine(newPath, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    CloudinaryDotNet.Account account = new CloudinaryDotNet.Account(
+                            _cloudinaryMetaData.CloudName,
+                            _cloudinaryMetaData.ApiKey,
+                            _cloudinaryMetaData.ApiSecret);
+
+                    Cloudinary cloudinary = new Cloudinary(account);
+
+                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.RemoveSpecialCharacters().Trim('"');
+
+                    var uploadParams = new ImageUploadParams()
                     {
-                        file.CopyTo(stream);
-                    }
+                        File = new FileDescription(fileName, file.OpenReadStream())
+                    };
+                    var uploadResult = cloudinary.Upload(uploadParams);
+                    //using (var stream = new FileStream(fullPath, FileMode.Create))
+                    //{
+                    //    file.CopyTo(stream);
+                    //}
 
                     if (file.Name == "idCard")
                     {
-                        user.ValidIdPhoto = fileName;
+                        user.ValidIdPhoto = uploadResult.Url.AbsoluteUri;
                     }
 
                     if (file.Name == "passportPhoto")
                     {
-                        user.PassportPhoto = fileName;
+                        user.PassportPhoto = uploadResult.Url.AbsoluteUri;
                     }
                 }
 
