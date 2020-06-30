@@ -57,7 +57,8 @@ namespace Nwassa
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   builder =>
                                   {
-                                      builder.WithOrigins("http://localhost:4200");
+                                      builder.WithOrigins("http://localhost:4200", 
+                                      "http://127.0.0.1:5500", "https://nwassa.com", "http://nwassa.com");
                                       builder.AllowAnyHeader();
                                       builder.AllowAnyMethod();
                                   });
