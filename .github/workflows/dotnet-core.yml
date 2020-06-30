@@ -24,9 +24,9 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Build and deploy the Docker image
-    env: 
-      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      APP_NAME: ${{ 'nwassa' }}
+      env: 
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        APP_NAME: ${{ 'nwassa' }}
       run: |
         cd ./ASPNetCoreLabs/HerokuContainer
         docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
