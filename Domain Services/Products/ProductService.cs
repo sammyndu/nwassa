@@ -84,7 +84,7 @@ namespace Nwassa.Domain_Services.Products
 					//{
 					//	file.CopyTo(stream);
 					//}
-					productDocument.ProductPhoto = uploadResult.Url.AbsoluteUri;
+					productDocument.ProductPhoto = uploadResult.SecureUrl.AbsoluteUri;
 				}
 				return _productRepository.Create(productDocument);
 
@@ -141,7 +141,7 @@ namespace Nwassa.Domain_Services.Products
 					//{
 					//	file.CopyTo(stream);
 					//}
-					product.ProductPhoto = uploadResult.Url.AbsoluteUri;
+					product.ProductPhoto = uploadResult.SecureUrl.AbsoluteUri;
 				}
 
 				_productRepository.Update(productId, product);

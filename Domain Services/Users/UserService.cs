@@ -136,12 +136,12 @@ namespace Nwassa.Domain_Services.Users
 
                     if (file.Name == "idCard")
                     {
-                        user.ValidIdPhoto = uploadResult.Url.AbsoluteUri;
+                        user.ValidIdPhoto = uploadResult.SecureUrl.AbsoluteUri;
                     }
 
                     if (file.Name == "passportPhoto")
                     {
-                        user.PassportPhoto = uploadResult.Url.AbsoluteUri;
+                        user.PassportPhoto = uploadResult.SecureUrl.AbsoluteUri;
                     }
                 }
 
