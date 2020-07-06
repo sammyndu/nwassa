@@ -60,6 +60,14 @@ namespace Nwassa.Data
             return collection.Find(filter).FirstOrDefault();
         }
 
+        public T GetRecordByPhone<T>(string table, string phone)
+        {
+            var collection = db.GetCollection<T>(table);
+            var filter = Builders<T>.Filter.Eq("PhoneNumber", phone);
+
+            return collection.Find(filter).FirstOrDefault();
+        }
+
         public Guid Upsert<T>(string table, T record, Guid id)
         {
             var collection = db.GetCollection<T>(table, collectionSettings);

@@ -46,9 +46,20 @@ namespace Nwassa.Domain_Services.Users
         public UserDocument GetByEmail(string email) =>
             _userRepository.Get(email);
 
+        public UserDocument GetByPhone(string phone) =>
+            _userRepository.GetPhone(phone);
+
         public UserDocument Create(UserDocument userDocument)
         {
-            var user = GetByEmail(userDocument.Email);
+            UserDocument user;
+            if (userDocument.Email != null)
+            {
+                user = GetByEmail(userDocument.Email);
+            }
+            else
+            {
+                user = GetByPhone(userDocument.PhoneNumber);
+            }
 
             if (user != null)
             {
@@ -157,6 +168,16 @@ namespace Nwassa.Domain_Services.Users
 
         public void Remove(Guid id) =>
             _userRepository.Remove(id);
+
+        private bool IsPhoneNumber(string username)
+        {
+            foreach (char c in username)
+            {
+                if (!char.IsDigit(c))
+                    return false;
+            }
+            return true;
+        }
 
     }
 }

@@ -29,6 +29,9 @@ namespace Nwassa.Data.Repositories
         public UserDocument Get(string email) =>
             _dataRepository.GetRecordByEmail<UserDocument>(_userTable, email);
 
+        public UserDocument GetPhone(string phone) =>
+            _dataRepository.GetRecordByPhone<UserDocument>(_userTable, phone);
+
         public UserDocument Create(UserDocument userDocument)
         {
             _dataRepository.InsertRecord(_userTable, userDocument);

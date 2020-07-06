@@ -15,6 +15,8 @@ namespace Nwassa.Core.Data
 
         UserDocument Get(string email);
 
+        UserDocument GetPhone(string phone);
+
         UserDocument Create(UserDocument UserDocument);
 
         void Update(Guid id, UserDocument userIn);

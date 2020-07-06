@@ -16,6 +16,8 @@ namespace Nwassa.Core.Data
 
         T GetRecordByEmail<T>(string table, string email);
 
+        T GetRecordByPhone<T>(string table, string phone);
+
         Guid Upsert<T>(string table, T record, Guid id);
 
         void Delete<T>(string table, Guid id);
