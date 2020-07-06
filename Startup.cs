@@ -58,7 +58,7 @@ namespace Nwassa
                                   builder =>
                                   {
                                       builder.WithOrigins("http://localhost:4200", 
-                                      "http://127.0.0.1:5500", "https://www.nwassa.com", "http://www.nwassa.com");
+                                      "http://127.0.0.1:5500", "https://www.nwassa.com", "http://www.nwassa.com", "https://nwassa.com", "http://nwassa.com");
                                       builder.AllowAnyHeader();
                                       builder.AllowAnyMethod();
                                   });
